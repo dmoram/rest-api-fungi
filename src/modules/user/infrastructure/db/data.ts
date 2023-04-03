@@ -54,5 +54,11 @@ export const data = [
       email: "user11@test.com",
       password: "1234567",
     },
+    {
+      name: "codigo",
+      email: "lagarto@test.com",
+      password: "1234567",
+    },
   ];
+
   

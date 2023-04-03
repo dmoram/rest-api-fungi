@@ -57,5 +57,10 @@ exports.data = [
         email: "user11@test.com",
         password: "1234567",
     },
+    {
+        name: "codigo",
+        email: "lagarto@test.com",
+        password: "1234567",
+    },
 ];
 //# sourceMappingURL=data.js.map
