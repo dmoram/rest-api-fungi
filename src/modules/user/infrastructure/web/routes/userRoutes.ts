@@ -5,7 +5,7 @@ import {
   getUsuarios,
   postUsuario,
   putUsuario,
-} from "../../../application/controllers/userController";
+} from "../../../application/controllers/UserController"
 import { check } from "express-validator";
 import { validarCampos } from "../middlewares/validar-campos";
 
