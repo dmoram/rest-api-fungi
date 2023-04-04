@@ -16,7 +16,7 @@ services:
     container_name: mariadb_database
     image: mariadb:jammy
     ports:
-      - ${PORTDB}:3307
+      - ${PORTDB}:3306
     volumes:
       - ./mariaDB:/var/lib/mysql
     environment:
