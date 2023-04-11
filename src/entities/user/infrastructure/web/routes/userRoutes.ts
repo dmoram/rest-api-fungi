@@ -5,7 +5,7 @@ import {
   getUsuarios,
   postUsuario,
   putUsuario,
-} from "../../../application/controllers/UserController"
+} from "../../../application/controllers/UserController";
 import { check } from "express-validator";
 import { validarCampos } from "../middlewares/validar-campos";
 
@@ -18,7 +18,17 @@ router.get("/:id", getUsuario);
 router.post(
   "/",
   [
-    check("name", "It has to be string and also be greater than 2 characters")
+    check(
+      "username",
+      "It has to be string and also be greater than 2 characters"
+    )
+      .not()
+      .isEmpty()
+      .isLength({ min: 5 }),
+    check(
+      "fullName",
+      "It has to be string and also be greater than 2 characters"
+    )
       .not()
       .isEmpty()
       .isLength({ min: 2 }),

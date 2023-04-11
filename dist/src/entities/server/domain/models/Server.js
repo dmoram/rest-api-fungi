@@ -24,7 +24,7 @@ class Server {
             seed: "/seed",
         };
         this.app = (0, express_1.default)();
-        this.port = process.env.PORT || "9000";
+        this.port = 8000;
         this.dbConnection();
         this.middlewares();
         this.routes();
@@ -54,7 +54,7 @@ class Server {
         this.app.use(this.apiPaths.seed, seed_1.default);
     }
     listen() {
-        this.app.listen(this.port, () => {
+        this.app.listen(this.port, '0.0.0.0', () => {
             console.log("Servidor corriendo en puerto " + this.port);
         });
     }

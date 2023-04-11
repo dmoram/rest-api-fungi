@@ -6,7 +6,12 @@ const Usuario = db.define('Usuario',{
         primaryKey: true,
         autoIncrement: true
     },
-    name: {
+    fullName: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        
+    },
+    username: {
         type: DataTypes.STRING,
         allowNull: false,
         
@@ -19,7 +24,19 @@ const Usuario = db.define('Usuario',{
     password: {
         type: DataTypes.STRING,
         allowNull: false,
-    }
+    },
+    gender: {
+        type: DataTypes.STRING,
+        allowNull: false,
+    },
+    age: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+    },
+    userType: {
+        type: DataTypes.STRING,
+        allowNull: false,
+    },
 },{ paranoid: true} )
 
 export default Usuario;

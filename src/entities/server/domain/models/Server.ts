@@ -6,15 +6,16 @@ import db from "../../../user/infrastructure/db/connection";
 
 class Server {
   private app: Application;
-  private port: string;
+  private port: number;
   private apiPaths = {
     usuarios: "/api/usuarios",
+    
     seed: "/seed",
   };
 
   constructor() {
     this.app = express();
-    this.port = process.env.PORT || "9000";
+    this.port = 8000;
 
     this.dbConnection();
     this.middlewares();
@@ -47,7 +48,7 @@ class Server {
   }
 
   listen() {
-    this.app.listen(this.port, () => {
+    this.app.listen(this.port, '0.0.0.0',() => {
       console.log("Servidor corriendo en puerto " + this.port);
     });
   }
