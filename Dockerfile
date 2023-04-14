@@ -16,6 +16,7 @@ COPY . .
 # Obtener el código en javascript
 RUN npm run build
 
+EXPOSE 8000
 
 # Ejecutamos el inicio de la aplicación
 CMD ["npm","start"]

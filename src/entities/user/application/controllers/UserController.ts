@@ -1,6 +1,9 @@
 import { Request, Response } from "express";
 import Usuario from "../../domain/models/User";
 import bcrypt from "bcryptjs";
+import jwt from 'jsonwebtoken';
+
+
 
 export const getUsuarios = async (req: Request, res: Response) => {
   const usuario = await Usuario.findAll();
@@ -58,6 +61,57 @@ export const postUsuario = async (req: Request, res: Response) => {
   }
 };
 
+export const loginUsuario = async (req: Request, res: Response) => {
+  const { email, password } = req.body;
+
+  try {
+    const usuario = await Usuario.findOne({
+      where: {
+        email: email,
+      },
+    });
+
+    if (!usuario) {
+      return res.status(404).json({
+        msg: `The user with email: ${email} not exists`,
+      });
+    }else if(usuario.getDataValue('deletedAt') != null){
+      return res.status(404).json({
+        msg: `The user with email: ${email} not exists`,
+      });
+    }
+    const isMatch = await bcrypt.compare(password, usuario.getDataValue('password'));
+
+    if (!isMatch) {
+      return res.status(400).json({
+        msg: "Invalid credentials",
+      });
+    }
+
+    const payload = {
+      usuario: {
+        id: usuario.getDataValue('id'),
+      },
+    };
+
+    jwt.sign(
+      payload,
+      process.env.JWT_SECRET || "",
+      { expiresIn: "7d" },
+      (error, token) => {
+        if (error) throw error;
+
+        res.status(200).json({id: usuario.getDataValue('id'), token});
+      }
+    );
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      msg: "Hable con el administrador",
+    });
+  }
+};
+
 export const putUsuario = async (req: Request, res: Response) => {
   const { id } = req.params;
   const { body } = req;
@@ -107,6 +161,7 @@ export const putUsuario = async (req: Request, res: Response) => {
 export const deleteUsuario = async (req: Request, res: Response) => {
   const { id } = req.params;
   const usuario = await Usuario.findByPk(id);
+  console.log('ga')
 
   if (!usuario) {
     return res.status(404).json({

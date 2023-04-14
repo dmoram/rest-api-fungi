@@ -5,6 +5,7 @@ import {
   getUsuarios,
   postUsuario,
   putUsuario,
+  loginUsuario
 } from "../../../application/controllers/UserController";
 import { check } from "express-validator";
 import { validarCampos } from "../middlewares/validar-campos";
@@ -39,6 +40,10 @@ router.post(
     validarCampos,
   ],
   postUsuario
+);
+
+router.post("/login",
+  loginUsuario
 );
 
 router.put("/:id", putUsuario);
