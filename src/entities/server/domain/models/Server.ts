@@ -2,7 +2,7 @@ import express, { Application } from "express";
 import userRoutes from "../../../user/infrastructure/web/routes/userRoutes";
 import seed from "../../../user/infrastructure/web/routes/seed";
 import cors from "cors";
-import db from "../../../user/infrastructure/db/connection";
+import db from "../../../../db/connection";
 
 class Server {
   private app: Application;
