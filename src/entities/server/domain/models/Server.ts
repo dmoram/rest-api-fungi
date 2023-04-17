@@ -1,6 +1,5 @@
 import express, { Application } from "express";
 import userRoutes from "../../../user/infrastructure/web/routes/userRoutes";
-import seed from "../../../user/infrastructure/web/routes/seed";
 import cors from "cors";
 import db from "../../../../db/connection";
 
@@ -9,8 +8,6 @@ class Server {
   private port: number;
   private apiPaths = {
     usuarios: "/api/usuarios",
-    
-    seed: "/seed",
   };
 
   constructor() {
@@ -44,7 +41,6 @@ class Server {
 
   routes() {
     this.app.use(this.apiPaths.usuarios, userRoutes);
-    this.app.use(this.apiPaths.seed, seed);
   }
 
   listen() {
