@@ -71,20 +71,17 @@ export const loginUsuario = async (req: Request, res: Response) => {
       },
     });
 
-    if (!usuario) {
+    if (!usuario || (usuario.getDataValue('deletedAt') != null)) {
       return res.status(404).json({
-        msg: `The user with email: ${email} not exists`,
-      });
-    }else if(usuario.getDataValue('deletedAt') != null){
-      return res.status(404).json({
-        msg: `The user with email: ${email} not exists`,
+        msg: `El usuario con correo: ${email} no existe`,
       });
     }
+    
     const isMatch = await bcrypt.compare(password, usuario.getDataValue('password'));
 
     if (!isMatch) {
       return res.status(400).json({
-        msg: "Invalid credentials",
+        msg: "Credenciales inválidas",
       });
     }
 
