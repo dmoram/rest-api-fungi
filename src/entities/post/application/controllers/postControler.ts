@@ -29,7 +29,7 @@ export const getPosts = async (req: Request, res: Response) => {
     const posts = await Post.findAll({
       include: {
         model: User,
-        attributes: ["username"],
+        attributes: ["username", "userType"],
       },
     });
 
