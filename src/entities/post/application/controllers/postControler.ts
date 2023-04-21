@@ -1,9 +1,28 @@
 import { Request, Response } from "express";
 import Post from "../../domain/models/Post";
 import User from "../../../user/domain/models/User";
+import multer from "multer";
+
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, "uploads/");
+  },
+  filename: function (req, file, cb) {
+    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
+    cb(null, uniqueSuffix + "-" + file.originalname);
+  },
+});
+
+const upload = multer({ storage: storage });
 
 export const createPost = async (req: Request, res: Response) => {
-  const { content, image, author_id, likes } = req.body;
+  const { content, author_id, likes } = req.body;
+  let image: string | undefined;
+
+  // Si se envió una imagen, guárdala en la ruta especificada en la configuración del almacenamiento de multer
+  if (req.file) {
+    image = req.file.path;
+  }
 
   if (!content || !author_id) {
     return res
@@ -58,8 +77,8 @@ export const putLikes = async (req: Request, res: Response) => {
     }
 
     post.update({
-      likes: likes
-    })
+      likes: likes,
+    });
     await post.save();
 
     res.json({

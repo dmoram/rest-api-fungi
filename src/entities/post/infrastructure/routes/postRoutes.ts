@@ -5,10 +5,13 @@ import {
   putLikes,
 } from "../../application/controllers/postControler";
 import { check } from "express-validator";
+import multer from "multer";
+
+const upload = multer({ dest: "uploads/" });
 
 const router = Router();
 
-router.post("/", createPost);
+router.post("/", upload.single("image"), createPost);
 
 router.get("/", getPosts);
 
