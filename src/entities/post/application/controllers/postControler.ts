@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import Post from "../../domain/models/Post";
 import User from "../../../user/domain/models/User";
 import multer from "multer";
+import path from "path";
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -9,7 +10,8 @@ const storage = multer.diskStorage({
   },
   filename: function (req, file, cb) {
     const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
-    cb(null, uniqueSuffix + "-" + file.originalname);
+    const fileExt = file.originalname.split(".").pop(); // obtener la extensión del archivo
+    cb(null, uniqueSuffix + "-" + file.originalname + "." + fileExt); // agregar la extensión al nombre de archivo
   },
 });
 
@@ -85,6 +87,30 @@ export const putLikes = async (req: Request, res: Response) => {
       post,
       ok: true,
     });
+  } catch (error) {
+    console.log(error);
+    return res.status(400).json({ msg: error });
+  }
+};
+
+export const getPostImage = async (req: Request, res: Response) => {
+  const { id } = req.params;
+
+  try {
+    // Busca el post que contenga la imagen solicitada
+    const post = await Post.findOne({ where: { id } });
+
+    if (!post) {
+      return res.status(404).json({ msg: "La imagen no fue encontrada" });
+    }
+
+    // Devuelve la imagen en formato de archivo
+    const imagePath = path.join(
+      "../../../../../..",
+      post.getDataValue("image")
+    );
+    console.log(imagePath);
+    res.sendFile(post.getDataValue("image"), {root :"."});
   } catch (error) {
     console.log(error);
     return res.status(400).json({ msg: error });

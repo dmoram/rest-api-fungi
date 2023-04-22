@@ -3,6 +3,7 @@ import {
   createPost,
   getPosts,
   putLikes,
+  getPostImage
 } from "../../application/controllers/postControler";
 import { check } from "express-validator";
 import multer from "multer";
@@ -16,5 +17,7 @@ router.post("/", upload.single("image"), createPost);
 router.get("/", getPosts);
 
 router.put("/", putLikes);
+
+router.get("/:id", getPostImage);
 
 export default router;
