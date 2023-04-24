@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import Post from "../../domain/models/Post";
 import User from "../../../user/domain/models/User";
+import PostLikes from "../../domain/models/PostLikes";
 import multer from "multer";
 import path from "path";
 
@@ -64,22 +65,36 @@ export const getPosts = async (req: Request, res: Response) => {
   }
 };
 
-export const putLikes = async (req: Request, res: Response) => {
-  const { id, likes } = req.body;
-  if (!id || !likes) {
+export const updateLikes = async (req: Request, res: Response) => {
+  const { post_id, user_id} = req.body;
+  if (!post_id || !user_id) {
     return res
       .status(400)
-      .json({ msg: "El ID del post y los likes son requeridos" });
+      .json({ msg: "El ID del post, usuario y los likes son requeridos" });
   }
   try {
-    const post = await Post.findByPk(id);
+    const post = await Post.findByPk(post_id);
 
     if (!post) {
       return res.status(404).json({ msg: "El post no fue encontrado" });
     }
 
+    // Verificar si el usuario ya ha dado like al post
+    const postLike = await PostLikes.findOne({
+      where: {
+        user_id: user_id,
+        post_id: post_id,
+      },
+    });
+
+    if (postLike) {
+      return res
+        .status(400)
+        .json({ msg: "El usuario ya ha dado like a este post" });
+    }
+
     post.update({
-      likes: likes,
+      likes: post.getDataValue("likes") + 1,
     });
     await post.save();
 
@@ -110,7 +125,7 @@ export const getPostImage = async (req: Request, res: Response) => {
       post.getDataValue("image")
     );
     console.log(imagePath);
-    res.sendFile(post.getDataValue("image"), {root :"."});
+    res.sendFile(post.getDataValue("image"), { root: "." });
   } catch (error) {
     console.log(error);
     return res.status(400).json({ msg: error });

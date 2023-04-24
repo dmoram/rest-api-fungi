@@ -1,6 +1,7 @@
 import { DataType, DataTypes } from "sequelize";
 import db from "../../../../db/connection";
 import User from "../../../user/domain/models/User";
+import PostLikes from "./PostLikes";
 
 const Post = db.define(
   "Post",
@@ -24,7 +25,7 @@ const Post = db.define(
     likes: {
       type: DataTypes.INTEGER,
       allowNull: false,
-    },
+    }
   },
   { paranoid: true }
 );

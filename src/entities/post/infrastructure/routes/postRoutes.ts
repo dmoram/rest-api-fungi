@@ -2,7 +2,7 @@ import { Router } from "express";
 import {
   createPost,
   getPosts,
-  putLikes,
+  updateLikes,
   getPostImage
 } from "../../application/controllers/postControler";
 import { check } from "express-validator";
@@ -16,7 +16,7 @@ router.post("/", upload.single("image"), createPost);
 
 router.get("/", getPosts);
 
-router.put("/", putLikes);
+router.put("/", updateLikes);
 
 router.get("/:id", getPostImage);
 
