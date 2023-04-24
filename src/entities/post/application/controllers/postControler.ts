@@ -66,11 +66,11 @@ export const getPosts = async (req: Request, res: Response) => {
 };
 
 export const updateLikes = async (req: Request, res: Response) => {
-  const { post_id, user_id} = req.body;
-  if (!post_id || !user_id) {
+  const { post_id, user_id, action } = req.body;
+  if (!post_id || !user_id || !action) {
     return res
       .status(400)
-      .json({ msg: "El ID del post, usuario y los likes son requeridos" });
+      .json({ msg: "El ID del post y usuario son requeridos" });
   }
   try {
     const post = await Post.findByPk(post_id);
@@ -86,17 +86,36 @@ export const updateLikes = async (req: Request, res: Response) => {
         post_id: post_id,
       },
     });
+    if (action === "like") {
+      if (postLike) {
+        return res
+          .status(400)
+          .json({ msg: "El usuario ya ha dado like a este post" });
+      }
 
-    if (postLike) {
-      return res
-        .status(400)
-        .json({ msg: "El usuario ya ha dado like a este post" });
+      const newPostLike = await PostLikes.create({
+        user_id: user_id,
+        post_id: post_id,
+      });
+
+      post.update({
+        likes: post.getDataValue("likes") + 1,
+      });
+
+      await post.save();
+    } else if (action === "dislike") {
+      if (!postLike) {
+        return res
+          .status(400)
+          .json({ msg: "El usuario no ha dado like a este post" });
+      }
+
+      // Eliminar la instancia de PostLikes correspondiente al usuario y al post
+      await postLike.destroy();
+      post.update({
+        likes: post.getDataValue("likes") - 1,
+      });
     }
-
-    post.update({
-      likes: post.getDataValue("likes") + 1,
-    });
-    await post.save();
 
     res.json({
       post,
@@ -105,6 +124,23 @@ export const updateLikes = async (req: Request, res: Response) => {
   } catch (error) {
     console.log(error);
     return res.status(400).json({ msg: error });
+  }
+};
+
+export const getLikeStatus = async (req: Request, res: Response) => {
+  const { post_id, user_id } = req.params;
+
+  try {
+    const like = await PostLikes.findOne({ where: { user_id, post_id } });
+    
+    if (like) {
+      res.json({ liked: true });
+    } else {
+      res.json({ liked: false });
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(400).json({ msg: 'Error: ' + error });
   }
 };
 
