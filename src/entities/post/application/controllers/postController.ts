@@ -130,9 +130,13 @@ export const updateLikes = async (req: Request, res: Response) => {
 export const getLikeStatus = async (req: Request, res: Response) => {
   const { post_id, user_id } = req.params;
 
+  if (!post_id || !user_id) {
+    res.status(401);
+  }
+
   try {
     const like = await PostLikes.findOne({ where: { user_id, post_id } });
-    
+
     if (like) {
       res.json({ liked: true });
     } else {
@@ -140,7 +144,7 @@ export const getLikeStatus = async (req: Request, res: Response) => {
     }
   } catch (error) {
     console.log(error);
-    res.status(400).json({ msg: 'Error: ' + error });
+    res.status(400).json({ msg: "Error: " + error });
   }
 };
 

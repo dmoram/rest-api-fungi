@@ -5,7 +5,7 @@ import {
   updateLikes,
   getPostImage,
   getLikeStatus,
-} from "../../application/controllers/postControler";
+} from "../../application/controllers/postController";
 import { check } from "express-validator";
 import multer from "multer";
 

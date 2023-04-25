@@ -1,6 +1,7 @@
 import express, { Application } from "express";
 import userRoutes from "../../../user/infrastructure/web/routes/userRoutes";
-import postRoutes from "../../../post/infrastructure/routes/postRoutes"
+import postRoutes from "../../../post/infrastructure/routes/postRoutes";
+import commentRoutes from "../../../comment/infrastructure/routes/commentRoutes";
 import cors from "cors";
 import db from "../../../../db/connection";
 
@@ -9,7 +10,8 @@ class Server {
   private port: number;
   private apiPaths = {
     usuarios: "/api/usuarios",
-    posts: "/api/posts"
+    posts: "/api/posts",
+    comments: "/api/comments",
   };
 
   constructor() {
@@ -43,11 +45,12 @@ class Server {
 
   routes() {
     this.app.use(this.apiPaths.usuarios, userRoutes);
-    this.app.use(this.apiPaths.posts, postRoutes)
+    this.app.use(this.apiPaths.posts, postRoutes);
+    this.app.use(this.apiPaths.comments, commentRoutes);
   }
 
   listen() {
-    this.app.listen(this.port, '0.0.0.0',() => {
+    this.app.listen(this.port, "0.0.0.0", () => {
       console.log("Servidor corriendo en puerto " + this.port);
     });
   }

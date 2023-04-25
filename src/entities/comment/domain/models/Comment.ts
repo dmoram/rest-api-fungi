@@ -1,10 +1,10 @@
 import { DataType, DataTypes } from "sequelize";
 import db from "../../../../db/connection";
 import User from "../../../user/domain/models/User";
-import PostLikes from "./PostLikes";
+import Post from "../../../post/domain/models/Post";
 
-const Post = db.define(
-  "Post",
+const Comment = db.define(
+  "Comment",
   {
     id: {
       type: DataTypes.INTEGER,
@@ -15,8 +15,9 @@ const Post = db.define(
       type: DataTypes.TEXT,
       allowNull: false,
     },
-    image: {
-      type: DataTypes.STRING,
+    post_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
     },
     author_id: {
       type: DataTypes.INTEGER,
@@ -25,12 +26,12 @@ const Post = db.define(
     likes: {
       type: DataTypes.INTEGER,
       allowNull: false,
-    }
+    },
   },
   { paranoid: true }
 );
 
-// Se agrega la relación de pertenencia a User
-Post.belongsTo(User, { foreignKey: 'author_id' });
+Comment.belongsTo(User, { foreignKey: "author_id" });
+Comment.belongsTo(Post, { foreignKey: "post_id" });
 
-export default Post;
+export default Comment;
