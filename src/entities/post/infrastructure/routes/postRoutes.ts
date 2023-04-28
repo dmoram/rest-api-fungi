@@ -17,7 +17,7 @@ router.post("/", upload.single("image"), createPost);
 
 router.get("/", getPosts);
 
-router.put("/", updateLikes);
+router.put("/likes", updateLikes);
 
 router.get("/:id", getPostImage);
 

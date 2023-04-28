@@ -25,6 +25,10 @@ const Post = db.define(
     likes: {
       type: DataTypes.INTEGER,
       allowNull: false,
+    },
+    comments: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
     }
   },
   { paranoid: true }

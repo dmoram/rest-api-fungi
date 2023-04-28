@@ -40,6 +40,17 @@ export const createComment = async (req: Request, res: Response) => {
       likes: 0,
     });
 
+    // Find the corresponding Post
+    const post = await Post.findByPk(post_id);
+
+    // Update the comments count and save the Post
+    if (post) {
+      post.update({
+        comments: post.getDataValue("comments") + 1,
+      });
+      await post.save();
+    }
+
     res.json({
       comment,
       ok: true,

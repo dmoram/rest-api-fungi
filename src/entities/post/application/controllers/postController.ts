@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import Post from "../../domain/models/Post";
+import Comment from "../../../comment/domain/models/Comment";
 import User from "../../../user/domain/models/User";
 import PostLikes from "../../domain/models/PostLikes";
 import multer from "multer";
@@ -34,7 +35,13 @@ export const createPost = async (req: Request, res: Response) => {
   }
 
   try {
-    const post = await Post.create({ content, image, author_id, likes });
+    const post = await Post.create({
+      content,
+      image,
+      author_id,
+      likes: 0,
+      comments: 0,
+    });
 
     res.json({
       post,
@@ -156,7 +163,7 @@ export const getPostImage = async (req: Request, res: Response) => {
     const post = await Post.findOne({ where: { id } });
 
     if (!post) {
-      return res.status(404).json({ msg: "La imagen no fue encontrada" });
+      return res.status(404).json({ msg: "El post no fue encontrado" });
     }
 
     // Devuelve la imagen en formato de archivo
