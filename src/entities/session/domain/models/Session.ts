@@ -3,7 +3,7 @@ import db from "../../../../db/connection";
 import Usuario from "../../../user/domain/models/User";
 
 const Session = db.define(
-  "Sesion",
+  "Session",
   {
     id: {
       type: DataTypes.INTEGER,
@@ -12,8 +12,7 @@ const Session = db.define(
     },
     user_id: {
       type: DataTypes.INTEGER,
-      primaryKey: true,
-      autoIncrement: true,
+      allowNull: false,
     },
     token: {
       type: DataTypes.STRING,

@@ -2,7 +2,6 @@ import express, { Application } from "express";
 import userRoutes from "../../../user/infrastructure/web/routes/userRoutes";
 import postRoutes from "../../../post/infrastructure/routes/postRoutes";
 import commentRoutes from "../../../comment/infrastructure/routes/commentRoutes";
-import Session from "../../../session/domain/models/Session";
 import SessionRoutes from "../../../session/infrastructure/routes/SessionRoutes"
 import cors from "cors";
 import db from "../../../../db/connection";

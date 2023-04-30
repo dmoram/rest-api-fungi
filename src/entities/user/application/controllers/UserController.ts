@@ -1,9 +1,8 @@
 import { Request, Response } from "express";
 import Usuario from "../../domain/models/User";
+import Session from "../../../session/domain/models/Session";
 import bcrypt from "bcryptjs";
-import jwt from 'jsonwebtoken';
-
-
+import jwt from "jsonwebtoken";
 
 export const getUsuarios = async (req: Request, res: Response) => {
   const usuario = await Usuario.findAll();
@@ -71,13 +70,16 @@ export const loginUsuario = async (req: Request, res: Response) => {
       },
     });
 
-    if (!usuario || (usuario.getDataValue('deletedAt') != null)) {
+    if (!usuario || usuario.getDataValue("deletedAt") != null) {
       return res.status(404).json({
         msg: `El usuario con correo: ${email} no existe`,
       });
     }
-    
-    const isMatch = await bcrypt.compare(password, usuario.getDataValue('password'));
+
+    const isMatch = await bcrypt.compare(
+      password,
+      usuario.getDataValue("password")
+    );
 
     if (!isMatch) {
       return res.status(400).json({
@@ -87,7 +89,7 @@ export const loginUsuario = async (req: Request, res: Response) => {
 
     const payload = {
       usuario: {
-        id: usuario.getDataValue('id'),
+        id: usuario.getDataValue("id"),
       },
     };
 
@@ -96,9 +98,19 @@ export const loginUsuario = async (req: Request, res: Response) => {
       process.env.JWT_SECRET || "",
       { expiresIn: "7d" },
       (error, token) => {
+        const user_id = usuario.getDataValue("id");
         if (error) throw error;
 
-        res.status(200).json({id: usuario.getDataValue('id'), token});
+        const session = Session.create({
+          user_id: user_id,
+          token: token,
+          fechaInicio: new Date(),
+          ip: "192.168.2.2",
+          active: true,
+        });
+
+
+        res.status(200).json({ id: user_id, token });
       }
     );
   } catch (error) {
@@ -158,7 +170,7 @@ export const putUsuario = async (req: Request, res: Response) => {
 export const deleteUsuario = async (req: Request, res: Response) => {
   const { id } = req.params;
   const usuario = await Usuario.findByPk(id);
-  console.log('ga')
+  console.log("ga");
 
   if (!usuario) {
     return res.status(404).json({

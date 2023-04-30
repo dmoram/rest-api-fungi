@@ -134,6 +134,29 @@ export const updateLikes = async (req: Request, res: Response) => {
   }
 };
 
+export const getPostLike = async (req: Request, res: Response) => {
+  const {post_id, user_id} = req.body;
+  console.log("p_id: ",post_id," u_id: ",user_id);
+
+  if (!post_id || !user_id) {
+    res.status(401);
+  }
+  try {
+    const like = await PostLikes.findOne({ where: { user_id, post_id } });
+
+    if (like) {
+      res.json({ liked: true, ok: true });
+    } else {
+      res.json({ liked: false, ok: true });
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(400).json({ msg: "Error: " + error });
+  }
+
+
+}
+
 export const getLikeStatus = async (req: Request, res: Response) => {
   const { post_id, user_id } = req.params;
 
@@ -145,9 +168,9 @@ export const getLikeStatus = async (req: Request, res: Response) => {
     const like = await PostLikes.findOne({ where: { user_id, post_id } });
 
     if (like) {
-      res.json({ liked: true });
+      res.json({ liked: true, ok: true });
     } else {
-      res.json({ liked: false });
+      res.json({ liked: false, ok: true });
     }
   } catch (error) {
     console.log(error);
