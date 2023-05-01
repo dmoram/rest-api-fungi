@@ -4,13 +4,6 @@ import Session from "../../../session/domain/models/Session";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
-export const getUsuarios = async (req: Request, res: Response) => {
-  const usuario = await Usuario.findAll();
-
-  res.json({
-    usuario,
-  });
-};
 
 export const getUsuario = async (req: Request, res: Response) => {
   const { id } = req.params;
@@ -87,32 +80,46 @@ export const loginUsuario = async (req: Request, res: Response) => {
       });
     }
 
-    const payload = {
-      usuario: {
-        id: usuario.getDataValue("id"),
+    const user_id = usuario.getDataValue("id");
+
+    // Buscar si hay una sesión activa para el usuario
+    const activeSession = await Session.findOne({
+      where: {
+        user_id,
+        active: true,
       },
-    };
+    });
 
-    jwt.sign(
-      payload,
-      process.env.JWT_SECRET || "",
-      { expiresIn: "7d" },
-      (error, token) => {
-        const user_id = usuario.getDataValue("id");
-        if (error) throw error;
+    let token;
+    if (activeSession) {
+      // Si hay una sesión activa, actualizar la sesión existente
+      token = jwt.sign(
+        { usuario: { id: user_id } },
+        process.env.JWT_SECRET || "",
+        { expiresIn: "7d" }
+      );
 
-        const session = Session.create({
-          user_id: user_id,
-          token: token,
-          fechaInicio: new Date(),
-          ip: "192.168.2.2",
-          active: true,
-        });
+      await activeSession.update({
+        token,
+        fechaInicio: new Date(),
+      });
+    } else {
+      // Si no hay una sesión activa, crear una nueva sesión
+      token = jwt.sign(
+        { usuario: { id: user_id } },
+        process.env.JWT_SECRET || "",
+        { expiresIn: "7d" }
+      );
 
+      await Session.create({
+        user_id,
+        token,
+        fechaInicio: new Date(),
+        active: true,
+      });
+    }
 
-        res.status(200).json({ id: user_id, token });
-      }
-    );
+    res.status(200).json({ id: user_id, token });
   } catch (error) {
     console.log(error);
     res.status(500).json({
@@ -120,6 +127,41 @@ export const loginUsuario = async (req: Request, res: Response) => {
     });
   }
 };
+
+export const logoutUsuario = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  try {
+    // Buscar la sesión activa del usuario y desactivarla
+    const activeSession = await Session.findOne({
+      where: {
+        user_id: id,
+        active: true,
+      },
+    });
+
+    if (!activeSession) {
+      return res.status(404).json({
+        msg: "No se encontró una sesión activa para el usuario"+id,
+      });
+    }
+
+    await activeSession.update({
+      fechaFin: new Date(),
+      active: false,
+    });
+
+    res.json({
+      msg: "Sesión cerrada correctamente",
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      msg: "Hable con el administrador",
+    });
+  }
+};
+
+
 
 export const putUsuario = async (req: Request, res: Response) => {
   const { id } = req.params;

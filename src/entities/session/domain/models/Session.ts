@@ -26,10 +26,6 @@ const Session = db.define(
       type: DataTypes.DATE,
       allowNull: true,
     },
-    ip: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
     active: {
       type: DataTypes.BOOLEAN,
       allowNull: false,

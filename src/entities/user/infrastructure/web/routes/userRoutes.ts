@@ -2,19 +2,18 @@ import { Router } from "express";
 import {
   deleteUsuario,
   getUsuario,
-  getUsuarios,
   postUsuario,
   putUsuario,
-  loginUsuario
+  loginUsuario,
+  logoutUsuario
 } from "../../../application/controllers/UserController";
 import { check } from "express-validator";
 import { validarCampos } from "../middlewares/validar-campos";
+import { protectRoute } from "../middlewares/protectRoute";
 
 const router = Router();
 
-router.get("/", getUsuarios);
-
-router.get("/:id", getUsuario);
+router.get("/:id", protectRoute , getUsuario);
 
 router.post(
   "/",
@@ -46,7 +45,10 @@ router.post("/login",
   loginUsuario
 );
 
+router.post("/logout/:id", protectRoute, logoutUsuario);
+
 router.put("/:id", putUsuario);
+
 router.delete("/:id", deleteUsuario);
 
 export default router;
