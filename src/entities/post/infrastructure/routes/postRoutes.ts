@@ -10,7 +10,7 @@ import {
 import { check } from "express-validator";
 import multer from "multer";
 
-const upload = multer({ dest: "uploads/" });
+const upload = multer({ dest: "uploads/posts/" });
 
 const router = Router();
 

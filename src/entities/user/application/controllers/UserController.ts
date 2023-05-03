@@ -141,7 +141,7 @@ export const logoutUsuario = async (req: Request, res: Response) => {
 
     if (!activeSession) {
       return res.status(404).json({
-        msg: "No se encontró una sesión activa para el usuario"+id,
+        msg: "No se encontró una sesión activa para el usuario",
       });
     }
 

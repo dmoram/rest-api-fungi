@@ -2,7 +2,8 @@ import express, { Application } from "express";
 import userRoutes from "../../../user/infrastructure/web/routes/userRoutes";
 import postRoutes from "../../../post/infrastructure/routes/postRoutes";
 import commentRoutes from "../../../comment/infrastructure/routes/commentRoutes";
-import SessionRoutes from "../../../session/infrastructure/routes/SessionRoutes"
+import SessionRoutes from "../../../session/infrastructure/routes/SessionRoutes";
+import RecordRoutes from "../../../record/infrastructure/routes/RecordRoutes";
 import cors from "cors";
 import db from "../../../../db/connection";
 
@@ -13,7 +14,8 @@ class Server {
     usuarios: "/api/usuarios",
     posts: "/api/posts",
     comments: "/api/comments",
-    sessions: "api/sessions",
+    sessions: "/api/sessions",
+    records: "/api/records",
   };
 
   constructor() {
@@ -50,6 +52,7 @@ class Server {
     this.app.use(this.apiPaths.posts, postRoutes);
     this.app.use(this.apiPaths.comments, commentRoutes);
     this.app.use(this.apiPaths.sessions, SessionRoutes);
+    this.app.use(this.apiPaths.records, RecordRoutes);
   }
 
   listen() {
