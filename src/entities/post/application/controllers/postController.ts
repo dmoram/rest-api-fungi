@@ -1,6 +1,5 @@
 import { Request, Response } from "express";
 import Post from "../../domain/models/Post";
-import Comment from "../../../comment/domain/models/Comment";
 import User from "../../../user/domain/models/User";
 import PostLikes from "../../domain/models/PostLikes";
 import multer from "multer";
@@ -135,8 +134,8 @@ export const updateLikes = async (req: Request, res: Response) => {
 };
 
 export const getPostLike = async (req: Request, res: Response) => {
-  const {post_id, user_id} = req.body;
-  console.log("p_id: ",post_id," u_id: ",user_id);
+  const { post_id, user_id } = req.body;
+  console.log("p_id: ", post_id, " u_id: ", user_id);
 
   if (!post_id || !user_id) {
     res.status(401);
@@ -153,9 +152,7 @@ export const getPostLike = async (req: Request, res: Response) => {
     console.log(error);
     res.status(400).json({ msg: "Error: " + error });
   }
-
-
-}
+};
 
 export const getLikeStatus = async (req: Request, res: Response) => {
   const { post_id, user_id } = req.params;
