@@ -198,3 +198,31 @@ export const getPostImage = async (req: Request, res: Response) => {
     return res.status(400).json({ msg: error });
   }
 };
+
+export const getPostCount = async (req: Request, res: Response) => {
+  const { user_id } = req.params;
+
+  try {
+    // Busca el usuario correspondiente al user_id
+    const user = await User.findOne({ where: { id: user_id } });
+
+    if (!user) {
+      return res.status(404).json({ msg: "El usuario no fue encontrado" });
+    }
+
+    // Busca los posts asociados al usuario
+    const posts = await Post.findAll({ where: { author_id: user_id } });
+
+    // Obtiene la cantidad de posts
+    const postCount = posts.length;
+
+    res.json({
+      user_id,
+      postCount,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(400).json({ msg: error });
+  }
+};
+

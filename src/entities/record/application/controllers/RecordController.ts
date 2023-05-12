@@ -4,6 +4,7 @@ import User from "../../../user/domain/models/User";
 import multer from "multer";
 import path from "path";
 import FungiRecord from "../../domain/models/FungiRecord";
+import RecordLikes from "../../domain/models/RecordLikes";
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -19,39 +20,169 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 export const createRecord = async (req: Request, res: Response) => {
-    const { author_id, description, location, latitude, longitude, altitude } = req.body;
-    let image: string | undefined;
-  
-    // Si se envió una imagen, guárdala en la ruta especificada en la configuración del almacenamiento de multer
-    if (req.file) {
-      image = req.file.path;
+  const { author_id, description, location, latitude, longitude, altitude, fungiClass } =
+    req.body;
+  let image: string | undefined;
+
+  // Si se envió una imagen, guárdala en la ruta especificada en la configuración del almacenamiento de multer
+  if (req.file) {
+    image = req.file.path;
+  }
+
+  if (!description || !author_id || !location) {
+    return res
+      .status(400)
+      .json({ msg: "La descripción, el autor y la ubicación son requeridos" });
+  }
+
+  try {
+    const record = await FungiRecord.create({
+      description,
+      author_id,
+      location,
+      image,
+      latitude,
+      longitude,
+      altitude,
+      fungiClass,
+      likes: 0,
+      comments: 0,
+    });
+
+    res.json({
+      record,
+      ok: true,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(400).json({ msg: error });
+  }
+};
+
+export const getRecords = async (req: Request, res: Response) => {
+  try {
+    const records = await FungiRecord.findAll({
+      include: {
+        model: User,
+        attributes: ["username", "userType"],
+      },
+    });
+    res.json({ records, ok: true });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ msg: "Error al obtener los registros" });
+  }
+};
+
+export const getRecordImage = async (req: Request, res: Response) => {
+  const { id } = req.params;
+
+  try {
+    // Busca el post que contenga la imagen solicitada
+    const record = await FungiRecord.findOne({ where: { id } });
+
+    if (!record) {
+      return res.status(404).json({ msg: "El post no fue encontrado" });
     }
-  
-    if (!description || !author_id || !location) {
-      return res
-        .status(400)
-        .json({ msg: "La descripción, el autor y la ubicación son requeridos" });
+
+    // Devuelve la imagen en formato de archivo
+    const imagePath = path.join(
+      "../../../../../..",
+      record.getDataValue("image")
+    );
+    console.log(imagePath);
+    res.sendFile(record.getDataValue("image"), { root: "." });
+  } catch (error) {
+    console.log(error);
+    return res.status(400).json({ msg: error });
+  }
+};
+
+export const updateLikes = async (req: Request, res: Response) => {
+  const { record_id, user_id, action } = req.body;
+  if (!record_id || !user_id || !action) {
+    return res
+      .status(400)
+      .json({ msg: "El ID del registro y usuario son requeridos" });
+  }
+  try {
+    const record = await FungiRecord.findByPk(record_id);
+
+    if (!record) {
+      return res.status(404).json({ msg: "El post no fue encontrado" });
     }
-  
-    try {
-      const record = await FungiRecord.create({
-        description,
-        author_id,
-        location,
-        image,
-        latitude,
-        longitude,
-        altitude,
-        likes: 0,
-        comments: 0
+
+    // Verificar si el usuario ya ha dado like al post
+    const recordLike = await RecordLikes.findOne({
+      where: {
+        user_id: user_id,
+        record_id: record_id,
+      },
+    });
+    if (action === "like") {
+      if (recordLike) {
+        return res
+          .status(400)
+          .json({ msg: "El usuario ya ha dado like a este post" });
+      }
+
+      const newRecordLike = await RecordLikes.create({
+        user_id: user_id,
+        record_id: record_id,
       });
-  
-      res.json({
-        record,
-        ok: true,
+
+      record.update({
+        likes: record.getDataValue("likes") + 1,
       });
-    } catch (error) {
-      console.log(error);
-      return res.status(400).json({ msg: error });
+
+      await record.save();
+    } else if (action === "dislike") {
+      if (!recordLike) {
+        return res
+          .status(400)
+          .json({ msg: "El usuario no ha dado like a este post" });
+      }
+
+      // Eliminar la instancia de PostLikes correspondiente al usuario y al post
+      await recordLike.destroy();
+      record.update({
+        likes: record.getDataValue("likes") - 1,
+      });
     }
-  };
+
+    res.json({
+      record,
+      ok: true,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(400).json({ msg: error });
+  }
+};
+
+export const getRecordCount = async (req: Request, res: Response) => {
+  const { user_id } = req.params;
+
+  try {
+    // Busca el usuario correspondiente al user_id
+    const user = await User.findOne({ where: { id: user_id } });
+
+    if (!user) {
+      return res.status(404).json({ msg: "El usuario no fue encontrado" });
+    }
+
+    // Busca los posts asociados al usuario
+    const records = await FungiRecord.findAll({ where: { author_id: user_id } });
+
+    // Obtiene la cantidad de posts
+    const recordCount = records.length;
+
+    res.json({
+      user_id,
+      recordCount,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(400).json({ msg: error });
+  }
+};

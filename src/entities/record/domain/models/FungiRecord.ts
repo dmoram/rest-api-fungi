@@ -1,7 +1,6 @@
 import { DataType, DataTypes } from "sequelize";
 import db from "../../../../db/connection";
 import User from "../../../user/domain/models/User";
-import PostLikes from "../../../post/domain/models/PostLikes";
 
 const FungiRecord = db.define(
   "FungiRecord",
@@ -37,6 +36,18 @@ const FungiRecord = db.define(
     },
     altitude: {
       type: DataTypes.FLOAT,
+      allowNull: true,
+    },
+    fungiClass: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    temperature: {
+      type: DataTypes.DECIMAL(9, 6),
+      allowNull: true,
+    },
+    humidity: {
+      type: DataTypes.DECIMAL(9, 6),
       allowNull: true,
     },
     likes: {
