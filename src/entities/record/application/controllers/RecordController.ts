@@ -64,7 +64,7 @@ export const getRecords = async (req: Request, res: Response) => {
     const records = await FungiRecord.findAll({
       include: {
         model: User,
-        attributes: ["username", "userType"],
+        attributes: ["username", "userType", "id"],
       },
     });
     res.json({ records, ok: true });
@@ -181,6 +181,30 @@ export const getRecordCount = async (req: Request, res: Response) => {
       user_id,
       recordCount,
     });
+  } catch (error) {
+    console.log(error);
+    return res.status(400).json({ msg: error });
+  }
+};
+
+export const deleteRecord = async (req: Request, res: Response) => {
+  const { record_id } = req.params;
+
+  try {
+    // Busca el registro por su ID
+    const record = await FungiRecord.findByPk(record_id);
+
+    if (!record) {
+      return res.status(404).json({ msg: "El registro no fue encontrado" });
+    }
+
+    // Elimina los registros de RecordLikes asociados al post
+    await RecordLikes.destroy({ where: { record_id} });
+
+    // Elimina el registro
+    await record.destroy();
+
+    res.json({ msg: "El registro ha sido eliminado exitosamente" });
   } catch (error) {
     console.log(error);
     return res.status(400).json({ msg: error });

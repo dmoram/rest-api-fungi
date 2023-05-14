@@ -119,7 +119,7 @@ export const loginUsuario = async (req: Request, res: Response) => {
       });
     }
 
-    res.status(200).json({ id: user_id, token });
+    res.status(200).json({ id: user_id, token, mod: usuario.getDataValue("moderator") });
   } catch (error) {
     console.log(error);
     res.status(500).json({

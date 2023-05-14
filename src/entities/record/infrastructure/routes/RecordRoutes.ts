@@ -4,7 +4,8 @@ import {
   getRecords,
   getRecordImage,
   updateLikes,
-  getRecordCount
+  getRecordCount,
+  deleteRecord,
 } from "../../application/controllers/RecordController";
 import multer from "multer";
 
@@ -20,6 +21,8 @@ router.get("/:id", getRecordImage);
 
 router.put("/likes", updateLikes);
 
-router.get("/count/:user_id", getRecordCount)
+router.get("/count/:user_id", getRecordCount);
+
+router.delete("/:record_id", deleteRecord);
 
 export default router;

@@ -37,6 +37,10 @@ const Usuario = db.define(
       type: DataTypes.STRING,
       allowNull: false,
     },
+    moderator: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+    },
   },
   { paranoid: true }
 );

@@ -57,7 +57,7 @@ export const getPosts = async (req: Request, res: Response) => {
     const posts = await Post.findAll({
       include: {
         model: User,
-        attributes: ["username", "userType"],
+        attributes: ["username", "userType","id"],
       },
     });
 
@@ -133,47 +133,6 @@ export const updateLikes = async (req: Request, res: Response) => {
   }
 };
 
-export const getPostLike = async (req: Request, res: Response) => {
-  const { post_id, user_id } = req.body;
-  console.log("p_id: ", post_id, " u_id: ", user_id);
-
-  if (!post_id || !user_id) {
-    res.status(401);
-  }
-  try {
-    const like = await PostLikes.findOne({ where: { user_id, post_id } });
-
-    if (like) {
-      res.json({ liked: true, ok: true });
-    } else {
-      res.json({ liked: false, ok: true });
-    }
-  } catch (error) {
-    console.log(error);
-    res.status(400).json({ msg: "Error: " + error });
-  }
-};
-
-export const getLikeStatus = async (req: Request, res: Response) => {
-  const { post_id, user_id } = req.params;
-
-  if (!post_id || !user_id) {
-    res.status(401);
-  }
-
-  try {
-    const like = await PostLikes.findOne({ where: { user_id, post_id } });
-
-    if (like) {
-      res.json({ liked: true, ok: true });
-    } else {
-      res.json({ liked: false, ok: true });
-    }
-  } catch (error) {
-    console.log(error);
-    res.status(400).json({ msg: "Error: " + error });
-  }
-};
 
 export const getPostImage = async (req: Request, res: Response) => {
   const { id } = req.params;
@@ -225,4 +184,29 @@ export const getPostCount = async (req: Request, res: Response) => {
     return res.status(400).json({ msg: error });
   }
 };
+
+export const deletePost = async (req: Request, res: Response) => {
+  const { post_id } = req.params;
+
+  try {
+    // Busca el post por su ID
+    const post = await Post.findByPk(post_id);
+
+    if (!post) {
+      return res.status(404).json({ msg: "El post no fue encontrado" });
+    }
+
+    // Elimina los registros de PostLikes asociados al post
+    await PostLikes.destroy({ where: { post_id } });
+
+    // Elimina el post
+    await post.destroy();
+
+    res.json({ msg: "El post ha sido eliminado exitosamente" });
+  } catch (error) {
+    console.log(error);
+    return res.status(400).json({ msg: error });
+  }
+};
+
 

@@ -4,9 +4,8 @@ import {
   getPosts,
   updateLikes,
   getPostImage,
-  getLikeStatus,
-  getPostLike,
-  getPostCount
+  getPostCount,
+  deletePost,
 } from "../../application/controllers/postController";
 import { check } from "express-validator";
 import multer from "multer";
@@ -19,14 +18,12 @@ router.post("/", upload.single("image"), createPost);
 
 router.get("/", getPosts);
 
-router.get("/like", getPostLike);
-
 router.put("/likes", updateLikes);
 
 router.get("/:id", getPostImage);
 
-router.get("/likes/:post_id/:user_id", getLikeStatus);
+router.get("/count/:user_id", getPostCount);
 
-router.get("/count/:user_id", getPostCount)
+router.delete("/:post_id", deletePost);
 
 export default router;
