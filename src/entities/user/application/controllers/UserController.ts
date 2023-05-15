@@ -96,7 +96,7 @@ export const loginUsuario = async (req: Request, res: Response) => {
       token = jwt.sign(
         { usuario: { id: user_id } },
         process.env.JWT_SECRET || "",
-        { expiresIn: "7d" }
+        { expiresIn: "14d" }
       );
 
       await activeSession.update({
@@ -108,7 +108,7 @@ export const loginUsuario = async (req: Request, res: Response) => {
       token = jwt.sign(
         { usuario: { id: user_id } },
         process.env.JWT_SECRET || "",
-        { expiresIn: "7d" }
+        { expiresIn: "14d" }
       );
 
       await Session.create({
