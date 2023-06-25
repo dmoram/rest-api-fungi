@@ -20,7 +20,7 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 export const createRecord = async (req: Request, res: Response) => {
-  const { author_id, description, location, latitude, longitude, altitude, fungiClass } =
+  const { author_id, description, location, latitude, longitude, altitude, fungiClass, temperature, humidity} =
     req.body;
   let image: string | undefined;
 
@@ -45,6 +45,8 @@ export const createRecord = async (req: Request, res: Response) => {
       longitude,
       altitude,
       fungiClass,
+      temperature,
+      humidity,
       likes: 0,
       comments: 0,
     });
